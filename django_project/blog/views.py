@@ -1,8 +1,10 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.models import User
+from django.contrib import messages
 from .models import Post
+from .forms import FeedbackForm
 
 
 
@@ -75,5 +77,18 @@ def about(request):
     return render(request, 'blog/about.html', {'title': 'About'})
 
 
+def contact(request):
+    return render(request, 'blog/contact.html', {'title': 'Contact Me'})
 
+
+def feedback(request):
+    if request.method == 'POST':
+        f = FeedbackForm(request.POST)
+        if f.is_valid():
+            f.save()
+            messages.add_message(request, messages.INFO, 'Feedback Submitted')
+            return redirect('blog-contact')
+    else:
+        f = FeedbackForm()
+    return render(request, 'blog/contact.html', {'form': f})
 
